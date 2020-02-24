@@ -8,7 +8,7 @@ namespace imu_simulation {
 struct IMUParams {
   int frequency = 200;
   double start_timestamp = 0.0;  // in seconds
-  double duration = 10.0;  // in seconds
+  double duration = 20.0;  // in seconds
 
   double acc_noise_sigma = 0.02;  //　m/(s^2) * 1/sqrt(hz)
   double gyro_noise_sigma = 0.02;  // rad/s * 1/sqrt(hz)
@@ -33,6 +33,33 @@ struct IMUMotionData {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
+class IMUSimulation {
+ public:
+  IMUSimulation() = default;
+  ~IMUSimulation() = default;
 
+  void SetIMUParams(const IMUParams &params) {
+    imu_params_ = params;
+  }
+
+  void SetBiasToZero() {
+    acc_bias_ = Eigen::Vector3d::Zero();
+    gyro_bias_ = Eigen::Vector3d::Zero();
+  }
+
+  void AddIMUNoise(IMUMotionData *data);
+
+  // currently a fixed motion model
+  void GetMotionData(double timestamp, IMUMotionData *data);
+
+ private:
+  void GetNormalDistributionNoise(Eigen::Vector3d *noise) const;
+
+ private:
+  IMUParams imu_params_;
+
+  Eigen::Vector3d acc_bias_;
+  Eigen::Vector3d gyro_bias_;
+};
 
 }  // namespace imu_simulation
